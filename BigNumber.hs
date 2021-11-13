@@ -1,21 +1,22 @@
-{--
+import Data.List
 -- EXERCICIO 2
 -- Uma definição do tipo BigNumber
-BigNumber :: 
+type BigNumber = [Int]
 
 --scanner, que converte uma string em big-number
-scanner :: String -> BigNumber
-scanner = 
+scanner :: String -> BigNumber 
+scanner s = map(read . (:"")) s  :: BigNumber 
 
 
 -- output, que converte um big-number em string
 output :: BigNumber -> String
+output b = (concat (map show (b)))
 
 
-
+{--
 -- para somar dois big-numbers.
 somaBN ::  BigNumber -> BigNumber -> BigNumber
-
+somaBN a b = reverse [x+y|(x,y)<-zip a b] --ainda por acabar
 
 
 -- subtrair dois big-numbers

@@ -6,8 +6,6 @@ fibRec n = fibRec (n-1) + fibRec (n-2)
 
 
 -- versão otimizada da função anterior, fibLista
---fibLista ::
---fibLista :: Int -> Int
 fibLista :: Integral a => Int -> [a] -> a
 fibLista i lista = head(drop i [fibRec x|x<-lista])
 
