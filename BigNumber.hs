@@ -1,4 +1,6 @@
+module BigNumber where
 import Data.List
+
 -- EXERCICIO 2
 -- Uma definição do tipo BigNumber
 type BigNumber = [Int]

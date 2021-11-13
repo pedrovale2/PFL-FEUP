@@ -1,3 +1,4 @@
+import BigNumber
 --Uma função recursiva, fibRec
 fibRec :: (Integral a) => a -> a
 fibRec 0 = 0
