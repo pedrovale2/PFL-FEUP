@@ -164,6 +164,28 @@ carrysMultNeg 1 [] = []
 carrysMultNeg n (x:xs)
                     | x + n <= -10 = [mod (x + n) (-10)] ++ carrysMultNeg (-(div (x + n) (-10))) xs
                     | otherwise = [x + n] ++ carrysneg 0 xs
+
+
+multiBefore :: BigNumber -> BigNumber -> [BigNumber]
+multiBefore a b = reverse (multiF a b)
+
+multiAux :: [BigNumber] -> [BigNumber]
+multiAux (x:xs ) = processList (x:xs) (length x - 1)
+
+multiAux1 :: BigNumber -> BigNumber -> BigNumber
+multiAux1 a b = sumMult(transpose(fillit(multiAux(multiBefore a b))))
+
+aux4 :: BigNumber -> BigNumber
+aux4 (x:xs)
+            | x > 0 = carrysMultPos 0 (x:xs)
+            | x < 0 = carrysMultNeg 0 (x:xs)
+            | otherwise = aux4 xs
+
+
+multiBN :: BigNumber -> BigNumber -> BigNumber
+multiBN a b = clearLeftZeros (reverse (aux4 ( multiAux1 a b)))
+
+                    --sumMult(transpose(fillit(processList( (x:xs) ((length x) -1 )))))
 -- reverse (carrysMultNeg 0 (sumMult(transpose(fillit(processList( reverse (multiF [5,2,6] [-1,-4,-3])) 2)))))
 {--             
 --a divisão inteira de dois big-numbers. A divisão deverá retornar um par “(quociente, resto)”
