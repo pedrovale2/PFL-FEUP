@@ -27,6 +27,7 @@ fillwithzero n a = if length a >= n then a else fillwithzero n (a ++ [0])
 
 --limpar os 0 a esquerda
 clearLeftZeros :: BigNumber -> BigNumber
+clearLeftZeros [0] = [0]
 clearLeftZeros [] = []
 clearLeftZeros (x:xs)
                 | x == 0 = [] ++ clearLeftZeros xs
@@ -65,6 +66,7 @@ carrysneg n (x:xs)
 
 --verificar se o resultado e negativo ou positivo, chamando consecutivamente as funções respetivas para tratar do resultado
 aux3 :: BigNumber -> BigNumber
+aux3 [0] = [0]
 aux3 (x:xs)
             | x > 0 = carryspos 0 (reverse (x:xs))
             | x < 0 = carrysneg 0 (reverse (x:xs))
@@ -72,7 +74,7 @@ aux3 (x:xs)
 
 --soma final
 somaBN :: BigNumber -> BigNumber -> BigNumber
-somaBN a b = clearLeftZeros (reverse (aux3  (teste a b)))
+somaBN a b = clearLeftZeros( reverse( (aux3  (teste a b))))
 
 
 -- subtrair dois big-numbers
@@ -176,14 +178,15 @@ multiAux1 :: BigNumber -> BigNumber -> BigNumber
 multiAux1 a b = sumMult(transpose(fillit(multiAux(multiBefore a b))))
 
 aux4 :: BigNumber -> BigNumber
+aux4 [0] = [0]
 aux4 (x:xs)
-            | x > 0 = carrysMultPos 0 (x:xs)
-            | x < 0 = carrysMultNeg 0 (x:xs)
+            | x > 0 = carrysMultPos 0 (reverse (x:xs))
+            | x < 0 = carrysMultNeg 0 (reverse (x:xs))
             | otherwise = aux4 xs
 
 
 multiBN :: BigNumber -> BigNumber -> BigNumber
-multiBN a b = clearLeftZeros (reverse (aux4 ( multiAux1 a b)))
+multiBN a b = reverse (aux4 (reverse (multiAux1 a b)))
 
                     --sumMult(transpose(fillit(processList( (x:xs) ((length x) -1 )))))
 -- reverse (carrysMultNeg 0 (sumMult(transpose(fillit(processList( reverse (multiF [5,2,6] [-1,-4,-3])) 2)))))
