@@ -39,7 +39,7 @@ somaAux = zipWith (+)
 
 --preencher as filas com zeros fazendo com que tenham o mesmo tamanho 
 --fazer a somas das listas revertendo-as
--- reverter voltando ao estado original com as somas
+--reverter voltando ao estado original com as somas
 teste :: BigNumber -> BigNumber -> BigNumber
 teste a b = reverse $ somaAux (fillwithzero (length b) (reverse a)) (fillwithzero (length a) (reverse b))
 
@@ -65,22 +65,24 @@ carrysneg n (x:xs)
                 | otherwise = (x + n) : carrysneg 0 xs
 
 --verificar se o resultado e negativo ou positivo, chamando consecutivamente as funções respetivas para tratar do resultado
-aux3 :: BigNumber -> BigNumber
-aux3 [0] = [0]
-aux3 (x:xs)
+checksignal :: BigNumber -> BigNumber
+checksignal [0] = [0]
+checksignal (x:xs)
             | x > 0 = carryspos 0 (reverse (x:xs))
             | x < 0 = carrysneg 0 (reverse (x:xs))
-            | otherwise = aux3 xs
+            | otherwise = checksignal xs
 
 --soma final
 somaBN :: BigNumber -> BigNumber -> BigNumber
-somaBN a b = clearLeftZeros( reverse( aux3  (teste a b)))
+somaBN a b = clearLeftZeros( reverse( checksignal  (teste a b)))
 
 
 -- subtrair dois big-numbers
 subAux ::  BigNumber -> BigNumber -> BigNumber
 subAux a b =  [x-y|(x,y)<-zip a b] --ainda por acabar
 
+
+--igual a teste1 so que para negativo
 teste2 :: BigNumber -> BigNumber -> BigNumber
 teste2 a b = subAux (fillwithzero (length b) (reverse a)) (fillwithzero (length a) (reverse b))
 
@@ -92,12 +94,7 @@ changeSignal :: BigNumber -> BigNumber
 changeSignal = map (\ x -> - x)
 
 subBN :: BigNumber -> BigNumber -> BigNumber
-subBN a b = clearLeftZeros (reverse (aux3 (teste a (changeSignal b))))
-
-try :: BigNumber -> BigNumber
-try [1] = [1]
-try [0] = [0]
-try a = somaBN (try (subBN a [1])) (try(subBN a [2]))
+subBN a b = clearLeftZeros (reverse (checksignal (teste a (changeSignal b))))
 
 
 --multiplicar dois big-numbers.
@@ -111,6 +108,8 @@ multAux = zipWith (*)
 multiSingular :: Int -> BigNumber -> BigNumber
 multiSingular n x = multAux (cycle ([n])) x
 
+
+--Preencher a lista de zeros
 prepListas :: Int -> BigNumber -> BigNumber
 prepListas n a = fillwithzero n (reverse a)
 
@@ -126,6 +125,7 @@ multiF a b = multiTotal (prepListas (length b) a) (prepListas (length a) b)
 addZeros :: BigNumber -> Int -> BigNumber
 addZeros x n = x ++ take n (cycle[0])
 
+--Preencher de zeros
 processList :: [BigNumber] -> Int -> [BigNumber]
 processList x 0 = x
 processList (x:xs) n = [fillLeftZero n x] ++ processList xs (n-1)
@@ -143,13 +143,15 @@ processList2 x 0 = x
 processList2 [] _ = []
 processList2 (x:xs) n = [addZeros x ( n -(length x))] ++ processList2 xs (n)
 
-
+--preenche ate ter o mesmo tamanho todos os BigNumbers
 fillit :: [BigNumber] -> [BigNumber]
 fillit [] = []
 fillit (x:xs) = sameSize (x:xs) (length x)
 
-sumMult [] = []
-sumMult (x:xs) = [sum x] ++ sumMult xs
+
+--soma todos os numeros da lista
+sumMult :: [BigNumber] -> BigNumber
+sumMult = map sum
 
 carrysMultPos :: Int -> BigNumber -> BigNumber
 carrysMultPos 1 [] = [1]
@@ -180,16 +182,18 @@ multiAux (x:xs ) = processList (x:xs) (length x - 1)
 multiAux1 :: BigNumber -> BigNumber -> BigNumber
 multiAux1 a b = sumMult(transpose(fillit(multiAux(multiBefore a b))))
 
-aux4 :: BigNumber -> BigNumber
-aux4 [0] = [0]
-aux4 (x:xs)
+
+--verifical se é negativo ou positivo
+checkSignalMul :: BigNumber -> BigNumber
+checkSignalMul [0] = [0]
+checkSignalMul (x:xs)
             | x > 0 = carrysMultPos 0 (reverse (x:xs))
             | x < 0 = carrysMultNeg 0 (reverse (x:xs))
-            | otherwise = aux4 xs
+            | otherwise = checkSignalMul xs
 
 
-multiBN :: BigNumber -> BigNumber -> BigNumber
-multiBN a b = reverse (aux4 (reverse (multiAux1 a b)))
+mulBN :: BigNumber -> BigNumber -> BigNumber
+mulBN a b = reverse (checkSignalMul (reverse (multiAux1 a b)))
 
 
 {--             
