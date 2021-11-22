@@ -27,21 +27,23 @@ fibRecBN [0] = [0]
 fibRecBN a = somaBN (fibRecBN (subBN a [1])) (fibRecBN(subBN a [2]))
 
 
+createBNList :: BigNumber -> [BigNumber]
+createBNList [0] = [[0]]
+createBNList a = [a] ++ createBNList (subBN a [1])
+
+
 -- versão otimizada da função anterior, fibLista
-fibListaBN :: Int -> [BigNumber] -> BigNumber
-fibListaBN i lista = head(drop i [fibRecBN x|x<-lista])
-
--- EXERCICIO 3
--- Agora com BN
+fibListaBNaux :: BigNumber -> [BigNumber]
+fibListaBNaux a = map fibRecBN (reverse (createBNList a))
 
 
-{--
-
-fibListaBN ::
-fibListaBN = 
+fibListaBN :: BigNumber -> BigNumber
+fibListaBN a = last (fibListaBNaux a)
 
 
-fibListaInfinitaBN ::
-fibListaInfinitaBN =
 
---}
+fibListaInfinitaBN :: [BigNumber]
+fibListaInfinitaBN = [0] : [1] : zipWith (somaBN) fibListaInfinitaBN (tail fibListaInfinitaBN)
+
+
+-- Para correr fibListaInfinitaBN -> fibListaInfinitaBN !! 12345
