@@ -31,7 +31,7 @@ clearLeftZeros [0] = [0]
 clearLeftZeros [] = []
 clearLeftZeros (x:xs)
                 | x == 0 = [] ++ clearLeftZeros xs
-                | otherwise = [x] ++ clearLeftZeros xs
+                | otherwise = [x] ++ xs
 
 -- para somar dois big-numbers.
 somaAux ::  BigNumber -> BigNumber -> BigNumber
@@ -50,7 +50,7 @@ carryspos 0 [] = []
 carryspos (-1) [] = []
 carryspos n (x:xs)
                 | x + n >= 10 =  mod (x + n) 10 : carryspos 1 xs
-                | x + n < 0 = [10 + x + n ] ++ carryspos (-1) xs
+                | x + n < 0 = (10 + x + n) : carryspos (-1) xs
                 | otherwise = (x + n) : carryspos 0 xs
 
 
@@ -74,7 +74,7 @@ aux3 (x:xs)
 
 --soma final
 somaBN :: BigNumber -> BigNumber -> BigNumber
-somaBN a b = clearLeftZeros( reverse( (aux3  (teste a b))))
+somaBN a b = clearLeftZeros( reverse( aux3  (teste a b)))
 
 
 -- subtrair dois big-numbers
@@ -94,7 +94,10 @@ changeSignal = map (\ x -> - x)
 subBN :: BigNumber -> BigNumber -> BigNumber
 subBN a b = clearLeftZeros (reverse (aux3 (teste a (changeSignal b))))
 
-
+try :: BigNumber -> BigNumber
+try [1] = [1]
+try [0] = [0]
+try a = somaBN (try (subBN a [1])) (try(subBN a [2]))
 
 
 --multiplicar dois big-numbers.
@@ -152,7 +155,7 @@ carrysMultPos :: Int -> BigNumber -> BigNumber
 carrysMultPos 1 [] = [1]
 carrysMultPos 0 [] = []
 carrysMultPos (-1) [] = []
-carrysMultPos n (x:xs) 
+carrysMultPos n (x:xs)
                     | x + n >= 10 = [mod (x + n) 10] ++ carrysMultPos (div (x + n) 10) xs
                     | otherwise = [(x + n)] ++ carrysMultPos 0 xs
 
@@ -188,8 +191,7 @@ aux4 (x:xs)
 multiBN :: BigNumber -> BigNumber -> BigNumber
 multiBN a b = reverse (aux4 (reverse (multiAux1 a b)))
 
-                    --sumMult(transpose(fillit(processList( (x:xs) ((length x) -1 )))))
--- reverse (carrysMultNeg 0 (sumMult(transpose(fillit(processList( reverse (multiF [5,2,6] [-1,-4,-3])) 2)))))
+
 {--             
 --a divisão inteira de dois big-numbers. A divisão deverá retornar um par “(quociente, resto)”
 divBN :: BigNumber -> BigNumber -> (BigNumber,BigNumber)
