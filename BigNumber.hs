@@ -151,12 +151,11 @@ fillit (x:xs) = sameSize (x:xs) (length x)
 
 --soma todos os numeros da lista
 sumMult :: [BigNumber] -> BigNumber
-sumMult = map sum
+sumMult [] = []
+sumMult (x:xs) = [sum x] ++ sumMult xs
 
 carrysMultPos :: Int -> BigNumber -> BigNumber
-carrysMultPos 1 [] = [1]
-carrysMultPos 0 [] = []
-carrysMultPos (-1) [] = []
+carrysMultPos x [] = [x]
 carrysMultPos n (x:xs)
                     | x + n >= 10 = [mod (x + n) 10] ++ carrysMultPos (div (x + n) 10) xs
                     | otherwise = [(x + n)] ++ carrysMultPos 0 xs
@@ -165,9 +164,7 @@ carrysMultPos n (x:xs)
 
 
 carrysMultNeg :: Int -> BigNumber -> BigNumber
-carrysMultNeg (-1) [] = [-1]
-carrysMultNeg 0 [] = []
-carrysMultNeg 1 [] = []
+carrysMultNeg x [] = [x]
 carrysMultNeg n (x:xs)
                     | x + n <= -10 = [mod (x + n) (-10)] ++ carrysMultNeg (-(div (x + n) (-10))) xs
                     | otherwise = [x + n] ++ carrysneg 0 xs
