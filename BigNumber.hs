@@ -190,10 +190,85 @@ checkSignalMul (x:xs)
 
 
 mulBN :: BigNumber -> BigNumber -> BigNumber
-mulBN a b = reverse (checkSignalMul (reverse (multiAux1 a b)))
+mulBN a b = clearLeftZeros (reverse (checkSignalMul (reverse (multiAux1 a b))))
 
 
-{--             
+
+-- compara o tamanho do divisor e do dividendo
+comparar1 :: (Ord a1, Num a2, Num a1) => [a1] -> [a1] -> ([a2], [a1])
+comparar1 (x:xs) (y:ys)
+            | length (x:xs) < length (y:xs) = ([0],(x:xs))
+            | length (x:xs) == length (y:ys) && x < y = ([0],(x:xs))
+            | otherwise = ([1],[1]) -- chamar outra funcao para fazer divisao
+
+maiorque :: Ord a => [a] -> [a] -> Bool
+maiorque [] [] = False
+maiorque (x:xs) (y:ys)
+            | length (x:xs) < length (y:ys) = False
+            | length (x:xs) == length (y:ys) && x < y = False
+            | length (x:xs) == length (y:ys) && x == y = maiorque xs ys
+            | otherwise = True
+
+maiorouigualque :: Ord a => [a] -> [a] -> Bool
+maiorouigualque [] [] = True 
+maiorouigualque (x:xs) (y:ys)
+            | length (x:xs) > length (y:ys) = True
+            | length (x:xs) == length (y:ys) && x > y = True
+            | length (x:xs) == length (y:ys) && x == y = maiorouigualque xs ys
+            | otherwise = False
+
+irbuscarmaisumelemento x a n = a ++ [x !! n]
+
+divaux a b n 
+            | maiorque (mulBN b [n+1]) a  = mulBN [n] [1]
+            | otherwise = divaux a b (n+1) 
+
+arranjarresto :: BigNumber -> BigNumber -> BigNumber -> BigNumber
+arranjarresto a b n = subBN a (mulBN b n)
+
+
+adicionarelem :: (Ord a, Num t, Eq t) => [a] -> [a] -> t -> [a]
+adicionarelem a b n
+                | maiorouigualque (retirarelem a n) b = retirarelem a n
+                | otherwise = adicionarelem a b (n+1)
+
+aux123 :: Ord a => [a] -> [a] -> [a]
+aux123 a b = adicionarelem a b (length b)
+
+
+aux1234 a b = arranjarresto (aux123 a b) b (divaux (aux123 a b) b 1)
+
+compor a b resto = divaux (aux123 a b ) b 1 ++ compor (irbuscarmaisumelemento a (arranjarresto (aux123 a b) b (divaux (aux123 a b) b 1) ) )
+
+--                                                                               -                  29                                   -
+{--
+comparar2 divisor dividendo (x:xs) (y:ys) a
+            | x < y = irbuscarmaisumelemento divisor dividendo [x] a
+            | x == y = comparar2 divisor dividendo xs ys [x]
+            | otherwise = --chamar funcao de dividir
+
+(arranjarresto (aux123 [3,5,4,8] [6,5]) [6,5] (divaux (adicionarelem [3,5,4,8] [6,5] (length [6,5])) [6,5]))
+[3,5,4,8] [6,5]
+
+arranjarresto (aux123 [3,5,4,8] [6,5]) [6,5] (divaux (aux123 [3,5,4,8] [6,5]) [6,5] 1)
+--}
+restododividendo :: (Eq t, Num t) => [a] -> t -> [a]
+restododividendo x (0) = x
+restododividendo (x:xs) n = [] ++ restododividendo xs (n-1)
+
+retirarelem :: (Eq t, Num t) => [a] -> t -> [a]
+retirarelem _ 0 = []
+retirarelem (x:xs) n = [x] ++ retirarelem xs (n-1)
+
+
+aux0 :: Foldable t => [a1] -> t a2 -> [a1]
+aux0 a b = retirarelem a (length b)
+{--   
+
+a b
+[3,2,1,4] [4,3]
+
+
 --a divisão inteira de dois big-numbers. A divisão deverá retornar um par “(quociente, resto)”
 divBN :: BigNumber -> BigNumber -> (BigNumber,BigNumber)
 
