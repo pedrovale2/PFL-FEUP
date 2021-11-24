@@ -245,14 +245,24 @@ arranjarresultado a b resto = divaux (auxiliarDividendo a b resto) b 1
 
 arranjarresultadoVazio a b resto = divaux (auxiliarDividendoVazio a b resto) b 1 
 
+compor :: BigNumber -> BigNumber-> BigNumber -> BigNumber
 compor a b resto 
                 | resto == [] && maiorque b a = [] -- ultima iteraçao
                 | resto == [] && maiorque a b = arranjarresultadoVazio a b resto ++ compor (aux1234 (auxiliarDividendoVazio a b resto) b) b (auxiliarCarryVazio a b resto)  --2ª ate a penultima
                 | otherwise = arranjarresultado a b resto ++ compor (aux1234 (auxiliarDividendo a b resto) b) b (auxiliarCarry a b resto)  --vazio primeira iteraçao
 
+try123 :: BigNumber -> BigNumber -> BigNumber
 try123 a b = arranjarresto a b (compor a b [])
 
-divBN a b = (compor a b [], try123 a b) 
+divBNaux :: BigNumber -> BigNumber -> (BigNumber, BigNumber)
+divBNaux a b = (compor a b [], try123 a b) 
+
+
+divBN :: BigNumber -> BigNumber-> (BigNumber, BigNumber)
+divBN a b
+        | b == [0] = ([0], [0])
+        | maiorque b a = ([0],a)
+        | otherwise = divBNaux a b
 
 auxiliarDividendo :: Ord a => [a] -> [a] -> [a] -> [a]
 auxiliarDividendo a b [] = a
@@ -282,19 +292,7 @@ auxiliarCarryVazio (x:xs) b resto
 
 
 
-{--
-comparar2 divisor dividendo (x:xs) (y:ys) a
-            | x < y = irbuscarmaisumelemento divisor dividendo [x] a
-            | x == y = comparar2 divisor dividendo xs ys [x]
-            | otherwise = --chamar funcao de dividir
 
-1- aux1234 (auxiliarDividendo [3,5,4,8] [6,5] []) [6,5]
-
-2- 
-[3,5,4,8] [6,5]
-
-aux1234 (auxiliarDividendo [3,5,4,8] b []) [6,5]) [6,5] (arranjarresultado [3,5,4,8] [6,5] []))
---}
 restododividendo :: (Eq t, Num t) => [a] -> t -> [a]
 restododividendo x (0) = x
 restododividendo (x:xs) n = [] ++ restododividendo xs (n-1)
@@ -304,20 +302,10 @@ retirarelem _ 0 = []
 retirarelem (x:xs) n = [x] ++ retirarelem xs (n-1)
 
 
-aux0 :: Foldable t => [a1] -> t a2 -> [a1]
-aux0 a b = retirarelem a (length b)
-{--   
-
-a b
-[3,2,1,4] [4,3]
-
-
---a divisão inteira de dois big-numbers. A divisão deverá retornar um par “(quociente, resto)”
-divBN :: BigNumber -> BigNumber -> (BigNumber,BigNumber)
 
 
 
--- EXERCICIO 5
-safeDivBN ::
-safeDivBN =
---}
+safeDivBN :: BigNumber -> BigNumber -> Maybe (BigNumber, BigNumber)
+safeDivBN a b
+            | maiorque b [0]= Just (divBN a b)
+            | otherwise = Nothing 
