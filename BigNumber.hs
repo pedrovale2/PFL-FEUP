@@ -202,7 +202,8 @@ comparar1 (x:xs) (y:ys)
             | otherwise = ([1],[1]) -- chamar outra funcao para fazer divisao
 
 maiorque :: Ord a => [a] -> [a] -> Bool
-maiorque [] [] = False
+maiorque [] _  = False  
+maiorque _ [] = True 
 maiorque (x:xs) (y:ys)
             | length (x:xs) < length (y:ys) = False
             | length (x:xs) == length (y:ys) && x < y = False
@@ -210,7 +211,8 @@ maiorque (x:xs) (y:ys)
             | otherwise = True
 
 maiorouigualque :: Ord a => [a] -> [a] -> Bool
-maiorouigualque [] [] = True 
+maiorouigualque _ [] = True 
+maiorouigualque [] _  = False  
 maiorouigualque (x:xs) (y:ys)
             | length (x:xs) > length (y:ys) = True
             | length (x:xs) == length (y:ys) && x > y = True
@@ -238,19 +240,60 @@ aux123 a b = adicionarelem a b (length b)
 
 aux1234 a b = arranjarresto (aux123 a b) b (divaux (aux123 a b) b 1)
 
-compor a b resto = divaux (aux123 a b ) b 1 ++ compor (irbuscarmaisumelemento a (arranjarresto (aux123 a b) b (divaux (aux123 a b) b 1) ) )
+arranjarresultado a b resto = divaux (auxiliarDividendo a b resto) b 1 
 
---                                                                               -                  29                                   -
+
+arranjarresultadoVazio a b resto = divaux (auxiliarDividendoVazio a b resto) b 1 
+
+compor a b resto 
+                | resto == [] && maiorque b a = [] -- ultima iteraçao
+                | resto == [] && maiorque a b = arranjarresultadoVazio a b resto ++ compor (aux1234 (auxiliarDividendoVazio a b resto) b) b (auxiliarCarryVazio a b resto)  --2ª ate a penultima
+                | otherwise = arranjarresultado a b resto ++ compor (aux1234 (auxiliarDividendo a b resto) b) b (auxiliarCarry a b resto)  --vazio primeira iteraçao
+
+try123 a b = arranjarresto a b (compor a b [])
+
+divBN a b = (compor a b [], try123 a b) 
+
+auxiliarDividendo :: Ord a => [a] -> [a] -> [a] -> [a]
+auxiliarDividendo a b [] = a
+auxiliarDividendo a b (x:xs)
+                            | maiorouigualque b a = auxiliarDividendo (a ++[x]) b xs  
+                            | otherwise = a
+                                 
+auxiliarCarry:: Ord a => [a] -> [a] -> [a] -> [a]
+auxiliarCarry a b [] = []
+auxiliarCarry a b (x:xs)
+                        | maiorouigualque b a = auxiliarCarry (a ++[x]) b xs    
+                        | otherwise = (x:xs)         
+
+
+
+auxiliarDividendoVazio :: Ord a => [a] -> [a] -> [a] -> [a]
+auxiliarDividendoVazio [] b resto = resto
+auxiliarDividendoVazio (x:xs) b resto
+                                | maiorouigualque b resto = auxiliarDividendoVazio xs b (resto ++ [x])   
+                                | otherwise = resto
+                                 
+auxiliarCarryVazio :: Ord a => [a] -> [a] -> [a] -> [a]
+auxiliarCarryVazio [] b resto = []
+auxiliarCarryVazio (x:xs) b resto
+                            | maiorouigualque b resto = auxiliarCarryVazio xs b (resto ++ [x])   
+                            | otherwise = (x:xs)    
+
+
+
 {--
 comparar2 divisor dividendo (x:xs) (y:ys) a
             | x < y = irbuscarmaisumelemento divisor dividendo [x] a
             | x == y = comparar2 divisor dividendo xs ys [x]
             | otherwise = --chamar funcao de dividir
 
-(arranjarresto (aux123 [3,5,4,8] [6,5]) [6,5] (divaux (adicionarelem [3,5,4,8] [6,5] (length [6,5])) [6,5]))
+1- aux1234 (auxiliarDividendo [3,5,4,8] [6,5] []) [6,5]
+
+2- 
 [3,5,4,8] [6,5]
 
-arranjarresto (aux123 [3,5,4,8] [6,5]) [6,5] (divaux (aux123 [3,5,4,8] [6,5]) [6,5] 1)
+aux1234 (auxiliarDividendo [3,5,4,8] b []) [6,5]) [6,5] (arranjarresultado [3,5,4,8] [6,5] []))
 --}
 restododividendo :: (Eq t, Num t) => [a] -> t -> [a]
 restododividendo x (0) = x
