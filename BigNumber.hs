@@ -219,8 +219,10 @@ maiorouigualque (x:xs) (y:ys)
             | length (x:xs) == length (y:ys) && x == y = maiorouigualque xs ys
             | otherwise = False
 
+irbuscarmaisumelemento :: BigNumber -> BigNumber -> Int -> BigNumber
 irbuscarmaisumelemento x a n = a ++ [x !! n]
 
+divaux :: BigNumber -> BigNumber -> Int -> BigNumber
 divaux a b n 
             | maiorque (mulBN b [n+1]) a  = mulBN [n] [1]
             | otherwise = divaux a b (n+1) 
@@ -238,11 +240,14 @@ aux123 :: Ord a => [a] -> [a] -> [a]
 aux123 a b = adicionarelem a b (length b)
 
 
+aux1234 :: BigNumber -> BigNumber -> BigNumber
 aux1234 a b = arranjarresto (aux123 a b) b (divaux (aux123 a b) b 1)
 
+arranjarresultado :: BigNumber -> BigNumber -> BigNumber -> BigNumber
 arranjarresultado a b resto = divaux (auxiliarDividendo a b resto) b 1 
 
 
+arranjarresultadoVazio :: BigNumber -> BigNumber -> BigNumber -> BigNumber
 arranjarresultadoVazio a b resto = divaux (auxiliarDividendoVazio a b resto) b 1 
 
 compor :: BigNumber -> BigNumber-> BigNumber -> BigNumber
@@ -290,12 +295,6 @@ auxiliarCarryVazio (x:xs) b resto
                             | maiorouigualque b resto = auxiliarCarryVazio xs b (resto ++ [x])   
                             | otherwise = (x:xs)    
 
-
-
-
-restododividendo :: (Eq t, Num t) => [a] -> t -> [a]
-restododividendo x (0) = x
-restododividendo (x:xs) n = [] ++ restododividendo xs (n-1)
 
 retirarelem :: (Eq t, Num t) => [a] -> t -> [a]
 retirarelem _ 0 = []
