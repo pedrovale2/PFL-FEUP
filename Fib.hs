@@ -10,8 +10,8 @@ fibRec n = fibRec (n-1) + fibRec (n-2)
 fibListaux :: Integral b => b -> [b]
 fibListaux n = map fibRec [0..n]
 
-fibList :: Int -> Int
-fibList n = fibListaux n !! n
+fibLista :: Int -> Int
+fibLista n = fibListaux n !! n
 
 
 --gerar uma lista infinita com todos os números de Fibonacci e retornar o elemento de ordem n,  fibListaInfinita

@@ -13,12 +13,23 @@ type BigNumber = [Int]
 
 --scanner, que converte uma string em big-number
 scanner :: String -> BigNumber
-scanner s = map(read . (:"")) s  :: BigNumber
+scanner s
+    |take 1 s == "-" = changeSignal(map(read . (:"")) (drop 1 s))
+    |otherwise = map(read . (:"")) s
 
+-- funções auxiliares do output
+addminus a = head a * (-1) : drop 1 a
+
+checksign :: BigNumber -> BigNumber
+checksign [0] = [0]
+checksign (x:xs)
+            | x < 0 = addminus(changeSignal (x:xs))
 
 -- output, que converte um big-number em string
 output :: BigNumber -> String
-output b = concat (map show (b))
+output b = concat (map show (checksign (b)))
+
+
 
 --introduzir 0 na lista ate ficar com n elementos
 fillwithzero :: Num a => Int -> [a] -> [a]
