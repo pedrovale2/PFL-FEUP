@@ -131,7 +131,30 @@ O trabalho prático teve como objetivo implementar as seguintes funções:
             > safeDivBN [-3,-4] [0] = Nothing
 
 
-**4. Compare as resoluções das alíneas 1 e 3** com tipos (Int -> Int), (Integer ->Integer) e (BigNumber -> BigNumber), comparando a sua aplicação a números grandes e verificando qual o maior número que cada uma aceita como argumento.
+***4. Compare as resoluções das alíneas 1 e 3 com tipos (Int -> Int), (Integer ->Integer) e (BigNumber -> BigNumber), comparando a sua aplicação a números grandes e verificando qual o maior número que cada uma aceita como argumento.***
+O maior número que o *Int* aceita como  argumento é 9223372036854775807, no entanto o *Integer* são inteiros que têm uma precisão arbitrária que pode ter um intervalo tão grande enquanto existe memória, por isso não existe o maior número para o Integer. Quanto aos *BigNumbers* tambem não existe limite podendo ser uma lista infinita.  
+
+Na tabela abaixo conseguimos ver a comparação entre os Ints e os BigNumbers.
+
+
+
+| Função               | Tipo       | NºFibonacci| Tempo    | 
+| --------             | --------   | --------   | -------- |
+| fibRec               | Int        | 2          | 0.02s    | 
+| fibRecBN             | BigNumber  | [2]        | 0.02s    |
+| fibRec               | Int        | 30         | 5.27s    |
+| fibRecBN             | BigNumber  |[3,0]       | 22.02s  
+| fibLista             | Int        | 2          | 0.00s    |
+| fibListaBN           | BigNumber  | [2]        | 0.02s    |
+| fibLista             | Int        | 30         | 4.09s    |
+| fibListaBN           | BigNumber  | [3,0]      | 27.98s   |
+| fibListaInfinita     | Int        | 30         | 0.01s    |
+| fibListaInfinitaBN   | BigNumber  | ?          | ?        |
+
+
+Resolvemos comparar com os números 2 e 30 pois conseguimos ver bem a diferença entre estes dois valores. Quando calculamos o resultado do Número de Fibonacci 2 com as funções tanto de BigNumber ou Int o resultado varia entre 0.00s e 0.02s. No entanto reparamos que quando usamos um número maior, neste caso usamos o 30, os resultados variam muito. Na função fibRec com Int demora 5.27s e com BigNumber demorou 22.02s. Na função fibLista notamos uma diferença similar de tempo. O Int demorou 4.09s e o BigNumber 27.98s. Uma função que nos surpreendeu na velocidade foi o fibListaInfita pois demorou apenas 0.01s a calcular o número de Fibonacci 30, testamos com números maiores e a eficiencia continuou igualmente rápida.
+
+
 
 
 
