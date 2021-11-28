@@ -17,13 +17,16 @@ scanner s
     |take 1 s == "-" = changeSignal(map(read . (:"")) (drop 1 s))
     |otherwise = map(read . (:"")) s
 
--- funções auxiliares do output
+--funções auxiliares do output
+addminus :: BigNumber -> BigNumber
 addminus a = head a * (-1) : drop 1 a
 
 checksign :: BigNumber -> BigNumber
 checksign [0] = [0]
+checksign [] = []
 checksign (x:xs)
             | x < 0 = addminus(changeSignal (x:xs))
+            | otherwise = [x] ++ checksign xs
 
 -- output, que converte um big-number em string
 output :: BigNumber -> String
@@ -88,22 +91,11 @@ somaBN :: BigNumber -> BigNumber -> BigNumber
 somaBN a b = clearLeftZeros( reverse( checksignal  (teste a b)))
 
 
--- subtrair dois big-numbers
-subAux ::  BigNumber -> BigNumber -> BigNumber
-subAux a b =  [x-y|(x,y)<-zip a b] --ainda por acabar
-
-
---igual a teste1 so que para negativo
-teste2 :: BigNumber -> BigNumber -> BigNumber
-teste2 a b = subAux (fillwithzero (length b) (reverse a)) (fillwithzero (length a) (reverse b))
-
-carrys2 :: Int -> [Int] -> [Int]
-carrys2 0 [] = []
-carrys2 n (x:xs) = if x < 0 then (x - n + 10) : carrys2 1 xs else (x - n) : carrys2 0 xs
-
+-- Transforma a subtração numa adiçao
 changeSignal :: BigNumber -> BigNumber
 changeSignal = map (\ x -> - x)
 
+--sub Final
 subBN :: BigNumber -> BigNumber -> BigNumber
 subBN a b = clearLeftZeros (reverse (checksignal (teste a (changeSignal b))))
 
@@ -124,15 +116,18 @@ multiSingular n x = multAux (cycle ([n])) x
 prepListas :: Int -> BigNumber -> BigNumber
 prepListas n a = fillwithzero n (reverse a)
 
-
+-- cria uma lista de BigNumbers com as multiplicaçoes feitas
+-- multiTotal [1,2,3] [4,5] => [[4*1=4,4*2=8,4*3=12], [5*1=5,5*2=10,5*3=15]]
 multiTotal :: BigNumber -> BigNumber -> [BigNumber]
 multiTotal _ [] = []
 multiTotal [] _ = []
 multiTotal a (x:xs) = [multiSingular x a ] ++ multiTotal a xs
 
-multiF :: BigNumber -> [Int] -> [BigNumber]
+-- prepara os bigNumbers colocando-os com o mesmo numero de elementos e invoca multiTotal para termos as multiplicaçoes
+multiF :: BigNumber -> BigNumber -> [BigNumber]
 multiF a b = multiTotal (prepListas (length b) a) (prepListas (length a) b)
 
+-- adiciona n zeros a lista x
 addZeros :: BigNumber -> Int -> BigNumber
 addZeros x n = x ++ take n (cycle[0])
 
@@ -141,10 +136,12 @@ processList :: [BigNumber] -> Int -> [BigNumber]
 processList x 0 = x
 processList (x:xs) n = [fillLeftZero n x] ++ processList xs (n-1)
 
+--coloca os BigNumber com o mesmo tamanho
 sameSize :: [BigNumber] -> Int -> [BigNumber]
 sameSize [] n = []
 sameSize (x:xs) n = processList2 [x] n ++ sameSize xs n
 
+-- adiciona n 0 a x, a esquerda
 fillLeftZero :: Num a => Int -> [a] -> [a]
 fillLeftZero n x = take n (cycle[0]) ++ x
 
@@ -165,15 +162,15 @@ sumMult :: [BigNumber] -> BigNumber
 sumMult [] = []
 sumMult (x:xs) = [sum x] ++ sumMult xs
 
+
+--trata do resultado final se for positivo
 carrysMultPos :: Int -> BigNumber -> BigNumber
 carrysMultPos x [] = [x]
 carrysMultPos n (x:xs)
                     | x + n >= 10 = [mod (x + n) 10] ++ carrysMultPos (div (x + n) 10) xs
                     | otherwise = [(x + n)] ++ carrysMultPos 0 xs
 
-
-
-
+--trata do resultado final se for negativo
 carrysMultNeg :: Int -> BigNumber -> BigNumber
 carrysMultNeg x [] = [x]
 carrysMultNeg n (x:xs)
@@ -181,12 +178,15 @@ carrysMultNeg n (x:xs)
                     | otherwise = [x + n] ++ carrysneg 0 xs
 
 
+-- faz a multiplicacao 
 multiBefore :: BigNumber -> BigNumber -> [BigNumber]
 multiBefore a b = reverse (multiF a b)
 
+-- processa o resultado da multiplicacao
 multiAux :: [BigNumber] -> [BigNumber]
 multiAux (x:xs ) = processList (x:xs) (length x - 1)
 
+-- faz a soma de todos os elementos 
 multiAux1 :: BigNumber -> BigNumber -> BigNumber
 multiAux1 a b = sumMult(transpose(fillit(multiAux(multiBefore a b))))
 
@@ -200,18 +200,11 @@ checkSignalMul (x:xs)
             | otherwise = checkSignalMul xs
 
 
+--Multiplicaçao final
 mulBN :: BigNumber -> BigNumber -> BigNumber
 mulBN a b = clearLeftZeros (reverse (checkSignalMul (reverse (multiAux1 a b))))
 
-
-
--- compara o tamanho do divisor e do dividendo
-comparar1 :: (Ord a1, Num a2, Num a1) => [a1] -> [a1] -> ([a2], [a1])
-comparar1 (x:xs) (y:ys)
-            | length (x:xs) < length (y:xs) = ([0],(x:xs))
-            | length (x:xs) == length (y:ys) && x < y = ([0],(x:xs))
-            | otherwise = ([1],[1]) -- chamar outra funcao para fazer divisao
-
+-- compara se x e maior que y e retorna true se for
 maiorque :: Ord a => [a] -> [a] -> Bool
 maiorque [] _  = False  
 maiorque _ [] = True 
@@ -221,6 +214,7 @@ maiorque (x:xs) (y:ys)
             | length (x:xs) == length (y:ys) && x == y = maiorque xs ys
             | otherwise = True
 
+-- compara se x e maior ou igual que y e retorna true se for
 maiorouigualque :: Ord a => [a] -> [a] -> Bool
 maiorouigualque _ [] = True 
 maiorouigualque [] _  = False  
@@ -230,14 +224,15 @@ maiorouigualque (x:xs) (y:ys)
             | length (x:xs) == length (y:ys) && x == y = maiorouigualque xs ys
             | otherwise = False
 
-irbuscarmaisumelemento :: BigNumber -> BigNumber -> Int -> BigNumber
-irbuscarmaisumelemento x a n = a ++ [x !! n]
-
+-- faz a divisao 
+-- divaux [1,2,3] [2,3] = [5]
 divaux :: BigNumber -> BigNumber -> Int -> BigNumber
 divaux a b n 
             | maiorque (mulBN b [n+1]) a  = mulBN [n] [1]
             | otherwise = divaux a b (n+1) 
 
+-- arranja o resto
+-- arranjarresto [1,2,3] [2,3] [5] = [8]
 arranjarresto :: BigNumber -> BigNumber -> BigNumber -> BigNumber
 arranjarresto a b n = subBN a (mulBN b n)
 
@@ -247,39 +242,25 @@ adicionarelem a b n
                 | maiorouigualque (retirarelem a n) b = retirarelem a n
                 | otherwise = adicionarelem a b (n+1)
 
+-- arranja os elementos a ser divididos
+-- aux123 [8,2,3,4] [2,3] = [8,2]
 aux123 :: Ord a => [a] -> [a] -> [a]
 aux123 a b = adicionarelem a b (length b)
 
-
+-- vai buscar o resto
 aux1234 :: BigNumber -> BigNumber -> BigNumber
 aux1234 a b = arranjarresto (aux123 a b) b (divaux (aux123 a b) b 1)
 
+-- trata do resultado da divisao depois da primeira iteracao
 arranjarresultado :: BigNumber -> BigNumber -> BigNumber -> BigNumber
 arranjarresultado a b resto = divaux (auxiliarDividendo a b resto) b 1 
 
-
+-- trata do resultado da divisao na primeira iteracao
 arranjarresultadoVazio :: BigNumber -> BigNumber -> BigNumber -> BigNumber
 arranjarresultadoVazio a b resto = divaux (auxiliarDividendoVazio a b resto) b 1 
 
-compor :: BigNumber -> BigNumber-> BigNumber -> BigNumber
-compor a b resto 
-                | resto == [] && maiorque b a = [] -- ultima iteraçao
-                | resto == [] && maiorque a b = arranjarresultadoVazio a b resto ++ compor (aux1234 (auxiliarDividendoVazio a b resto) b) b (auxiliarCarryVazio a b resto)  --2ª ate a penultima
-                | otherwise = arranjarresultado a b resto ++ compor (aux1234 (auxiliarDividendo a b resto) b) b (auxiliarCarry a b resto)  --vazio primeira iteraçao
 
-try123 :: BigNumber -> BigNumber -> BigNumber
-try123 a b = arranjarresto a b (compor a b [])
-
-divBNaux :: BigNumber -> BigNumber -> (BigNumber, BigNumber)
-divBNaux a b = (compor a b [], try123 a b) 
-
-
-divBN :: BigNumber -> BigNumber-> (BigNumber, BigNumber)
-divBN a b
-        | b == [0] = ([0], [0])
-        | maiorque b a = ([0],a)
-        | otherwise = divBNaux a b
-
+-- FUncoes auxiliares da divisao a partir da primeira iteraçao
 auxiliarDividendo :: Ord a => [a] -> [a] -> [a] -> [a]
 auxiliarDividendo a b [] = a
 auxiliarDividendo a b (x:xs)
@@ -293,7 +274,7 @@ auxiliarCarry a b (x:xs)
                         | otherwise = (x:xs)         
 
 
-
+-- FUncoes auxiliares da divisao na primeira iteraçao
 auxiliarDividendoVazio :: Ord a => [a] -> [a] -> [a] -> [a]
 auxiliarDividendoVazio [] b resto = resto
 auxiliarDividendoVazio (x:xs) b resto
@@ -312,7 +293,27 @@ retirarelem _ 0 = []
 retirarelem (x:xs) n = [x] ++ retirarelem xs (n-1)
 
 
+-- compoe todas as funcoes
+compor :: BigNumber -> BigNumber-> BigNumber -> BigNumber
+compor a b resto 
+                | resto == [] && maiorque b a = [] -- ultima iteraçao
+                | resto == [] && maiorque a b = arranjarresultadoVazio a b resto ++ compor (aux1234 (auxiliarDividendoVazio a b resto) b) b (auxiliarCarryVazio a b resto)  --2ª ate a penultima
+                | otherwise = arranjarresultado a b resto ++ compor (aux1234 (auxiliarDividendo a b resto) b) b (auxiliarCarry a b resto)  --vazio primeira iteraçao
 
+
+-- trata do resto
+restoaux :: BigNumber -> BigNumber -> BigNumber
+restoaux a b = arranjarresto a b (compor a b [])
+
+divBNaux :: BigNumber -> BigNumber -> (BigNumber, BigNumber)
+divBNaux a b = (compor a b [], restoaux a b) 
+
+
+divBN :: BigNumber -> BigNumber-> (BigNumber, BigNumber)
+divBN a b
+        | b == [0] = ([0], [0])
+        | maiorque b a = ([0],a)
+        | otherwise = divBNaux a b
 
 
 safeDivBN :: BigNumber -> BigNumber -> Maybe (BigNumber, BigNumber)
