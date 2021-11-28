@@ -42,8 +42,9 @@ fibListaBN a = last (fibListaBNaux a)
 
 
 
-fibListaInfinitaBN :: [BigNumber]
-fibListaInfinitaBN = [0] : [1] : zipWith (somaBN) fibListaInfinitaBN (tail fibListaInfinitaBN)
+fibListaInfinitaBNaux :: [BigNumber]
+fibListaInfinitaBNaux = [0] : [1] : zipWith (somaBN) fibListaInfinitaBNaux (tail fibListaInfinitaBNaux)
 
+fibListaInfinitaBN :: Int -> BigNumber
+fibListaInfinitaBN n = fibListaInfinitaBNaux !! n
 
--- Para correr fibListaInfinitaBN -> fibListaInfinitaBN !! 12345
