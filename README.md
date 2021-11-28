@@ -143,13 +143,13 @@ Na tabela abaixo conseguimos ver a comparação entre os Ints e os BigNumbers.
 | fibRec               | Int        | 2          | 0.02s    | 
 | fibRecBN             | BigNumber  | [2]        | 0.02s    |
 | fibRec               | Int        | 30         | 5.27s    |
-| fibRecBN             | BigNumber  |[3,0]       | 22.02s  
+| fibRecBN             | BigNumber  |[3,0]       | 22.02s   |
 | fibLista             | Int        | 2          | 0.00s    |
 | fibListaBN           | BigNumber  | [2]        | 0.02s    |
 | fibLista             | Int        | 30         | 4.09s    |
 | fibListaBN           | BigNumber  | [3,0]      | 27.98s   |
 | fibListaInfinita     | Int        | 30         | 0.01s    |
-| fibListaInfinitaBN   | BigNumber  | ?          | ?        |
+| fibListaInfinitaBN   | BigNumber  | 30         | 0.01s    |
 
 
 Resolvemos comparar com os números 2 e 30 pois conseguimos ver bem a diferença entre estes dois valores. Quando calculamos o resultado do Número de Fibonacci 2 com as funções tanto de BigNumber ou Int o resultado varia entre 0.00s e 0.02s. No entanto reparamos que quando usamos um número maior, neste caso usamos o 30, os resultados variam muito. Na função fibRec com Int demora 5.27s e com BigNumber demorou 22.02s. Na função fibLista notamos uma diferença similar de tempo. O Int demorou 4.09s e o BigNumber 27.98s. Uma função que nos surpreendeu na velocidade foi o fibListaInfita pois demorou apenas 0.01s a calcular o número de Fibonacci 30, testamos com números maiores e a eficiencia continuou igualmente rápida.
@@ -161,3 +161,4 @@ Resolvemos comparar com os números 2 e 30 pois conseguimos ver bem a diferença
 **Realizado por G4_08:**
 * *Marina Dias* - up201806787
 * *Pedro Vale* - up201806083
+
