@@ -318,5 +318,5 @@ divBN a b
 
 safeDivBN :: BigNumber -> BigNumber -> Maybe (BigNumber, BigNumber)
 safeDivBN a b
-            | maiorque b [0]= Just (divBN a b)
+            | maiorque (clearLeftZeros b) [0]= Just (divBN a b)
             | otherwise = Nothing 
